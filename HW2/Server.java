@@ -5,10 +5,10 @@ import java.io.*;
 
 public class Server {
 
-    int myID;
-    int acks = 1;
-    String seating;
-    boolean requested = False;
+    public static int myID;
+    public static int acks = 1;
+    public static String[] seating;
+    public static boolean requested = false;
 
     public static void SendAck(){
         // Send an acknowledgement when a request comes in
@@ -28,19 +28,23 @@ public class Server {
 
     public String Search(String[] seats, String name){
         // Handle search requests
+        return "";
     }
 
     public String Delete(String[] seats, String name){
         // Handle delete requests
+        return "";
     }
 
     public synchronized String Reserve(String[] seats, String name){
         // Handle reserve requests
+        return "";
     }
 
     public synchronized String BookSeat(String[] seats, String name,
                                         String seatNum){
         // Handle bookSeat requests
+        return "";
     }
 
     public static void main (String[] args) {
@@ -65,15 +69,17 @@ public class Server {
         }
 
         // Synchronize the reservation list on startup
-        this.seating = new String[numSeat];
-        SyncSeating()
+        seating = new String[numSeat];
+        SyncSeating();
 
         // Handle requests from clients
         try{
             while (true){
                 String[] data;
-                ServerSocket srv = new ServerSocket(servers[this.myID])
-                Socket sock = new srv.accept();
+                String msg;
+                String returnData = "Error processing the transaction. Please try again.";
+                ServerSocket srv = new ServerSocket(Integer.parseInt(servers[myID][1]));
+                Socket sock = srv.accept();
                 PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
                 out.println("Server Connected");
                 BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
@@ -86,9 +92,9 @@ public class Server {
                     SendAck();
                 }
                 // Enter critical section if we have an ack from all servers
-                if (this.requested && this.acks == numServer){
-                    this.requested = False;
-                    this.acks = 1;
+                if (requested && acks == numServer){
+                    requested = false;
+                    acks = 1;
                     if (data[0].equals("reserve")){
                         // Send appropriate response to client
                     } else if (data[0].equals("bookSeat")) {
@@ -107,9 +113,9 @@ public class Server {
                     sock.close();
                     srv.close();
                 }
-            } catch(Exception e) {
-                System.out.print("Error handling the request\n");
             }
+        } catch(Exception e) {
+            System.out.print("Error handling the request");
         }
     }
 }

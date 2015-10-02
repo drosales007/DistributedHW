@@ -6,7 +6,9 @@ import java.io.*;
 public class Server {
 
     int myID;
+    int acks = 1;
     String seating;
+    boolean requested = False;
 
     public static void SendAck(){
         // Send an acknowledgement when a request comes in
@@ -81,23 +83,30 @@ public class Server {
                 msg = in.readLine();
                 data = msg.split(" ");
                 if (data[0].equals("RequestCS")){
-                    // Handle request
-                } else if (data[0].equals("reserve")){
-                    // Send appropriate response to client
-                } else if (data[0].equals("bookSeat")) {
-                    // Send appropriate response to client
-                } else if (data[0].equals("search")) {
-                    // Send appropriate response to client
-                } else if (data[0].equals("delete")) {
-                    // Send appropriate response to client
-                } else {
-                    System.out.println("ERROR: No such command");
+                    SendAck();
                 }
-                // Send the response and close the connection
-                out.println(returnData);
-                out.close();
-                sock.close();
-                srv.close();
+                // Enter critical section if we have an ack from all servers
+                if (this.requested && this.acks == numServer){
+                    this.requested = False;
+                    this.acks = 1;
+                    if (data[0].equals("reserve")){
+                        // Send appropriate response to client
+                    } else if (data[0].equals("bookSeat")) {
+                        // Send appropriate response to client
+                    } else if (data[0].equals("search")) {
+                        // Send appropriate response to client
+                    } else if (data[0].equals("delete")) {
+                        // Send appropriate response to client
+                    } else {
+                        System.out.println("ERROR: No such command");
+                    }
+                    // Send the response and close the connection
+                    out.println(returnData);
+                    ReleaseCS();
+                    out.close();
+                    sock.close();
+                    srv.close();
+                }
             } catch(Exception e) {
                 System.out.print("Error handling the request\n");
             }

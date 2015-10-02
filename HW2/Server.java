@@ -18,7 +18,6 @@ public class Server {
         sc.nextLine();
 
         for (int i = 0; i < numServer; i++) {
-            // TODO: parse inputs to get the ips and ports of servers
             String server = sc.nextLine();
             String[] servInfo = server.split(":");
             servers[i][0] = servInfo[0];

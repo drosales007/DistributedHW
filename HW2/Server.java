@@ -41,7 +41,7 @@ public class Server {
 
     public static void RequestCS(String[][] servers){
         // Broadcast a message to request the critical section
-        for (int i=1; i<numSrvs; i++) {
+        for (int i=1; i<numSrvs + 1; i++) {
             if (i!=ID){
                 BCThread t = new BCThread(servers, i, "request", ID);
                 t.start();
@@ -123,6 +123,9 @@ public class Server {
 
         // Create an array to keep track of all server ips
         String[][] servers = new String[numServer+1][2];
+        servers[0][0] = "";
+        servers[0][1] = "";
+
         // Create an array to keep track of seating
         seating = new String[numSeat];
         for (int i=0; i<seating.length; i++){
@@ -130,16 +133,19 @@ public class Server {
         }
         sc.nextLine();
 
-        for (int i = 0; i < numServer; i++) {
+        for (int i = 1; i < numServer + 1; i++) {
             String server = sc.nextLine();
             String[] servInfo = server.split(":");
-            servers[i+1][0] = servInfo[0];
-            servers[i+1][1] = servInfo[1];
+            servers[i][0] = servInfo[0];
+            servers[i][1] = servInfo[1];
+        }
+
+        for (int i=0; i<numServer + 1; i++){
+            System.out.println("ID: " + i + ", IP: " + servers[i][0] + ", Port: " + servers[i][1]);
         }
 
         // Synchronize the reservation list on startup
-        /*seating = new String[numSeat];
-        SyncSeating();*/
+        // SyncSeating();
 
         // Handle requests from clients
         try{
@@ -156,6 +162,7 @@ public class Server {
                     // wait
                 }
                 msg = in.readLine();
+                System.out.println(msg);
                 data = msg.split(" ");
                 if (data[0].equals("RequestCS")){
                     returnData = "Acknowledge ServerID: " + myID;

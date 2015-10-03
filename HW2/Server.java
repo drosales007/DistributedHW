@@ -2,13 +2,15 @@ import java.util.Scanner;
 import java.lang.*;
 import java.net.*;
 import java.io.*;
+import java.util.Arrays;
 
 public class Server {
 
-    public static int myID;
-    public static int acks = 1;
+    public static int ID;
+    public static int numSrvs;
     public static String[] seating;
-    public static boolean requested = false;
+    Queue q = new Queue();
+    public static String[] CLIENT_REQUESTS = {"reserve", "bookSeat", "search", "delete"};
 
     public static void SendAck(){
         // Send an acknowledgement when a request comes in
@@ -18,12 +20,36 @@ public class Server {
         // Handles an acknowlegment
     }
 
-    public static void ReleaseCS(){
+    public static void ReleaseCS(String[][] servers){
         // Broadcast a message releaseing the critical section
+        for (int i=1; i<numSrvs; i++){
+            if (i!=ID){
+                BCThread t = new BCThread(servers, i, "release", ID);
+                t.start();
+                try {
+                    t.join();
+                } catch (Exception e) {
+                    System.out.println("There was an exception in join.");
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
-    public static void SendRequest(){
-        // Send a request to access the critical section
+    public static void RequestCS(String[][] servers){
+        // Broadcast a message to request the critical section
+        for (int i=1; i<numSrvs; i++) {
+            if (i!=ID){
+                BCThread t = new BCThread(servers, i, "request", ID);
+                t.start();
+                try {
+                    t.join();
+                } catch (Exception e) {
+                    System.out.println("There was an exception in join.");
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public static void SyncSeating(){
@@ -51,16 +77,6 @@ public class Server {
         return "";
     }
 
-    public class Queue{
-
-        Node head;
-        Nonde next;
-
-        public Queue(){
-            
-        }
-    }
-
     public static void main (String[] args) {
 
         Scanner sc = new Scanner(System.in);
@@ -68,6 +84,8 @@ public class Server {
         int numServer = sc.nextInt();
         int numSeat = sc.nextInt();
 
+        ID = myID;
+        numSrvs = numServer;
 
         // Create an array to keep track of all server ips
         String[][] servers = new String[numServer][2];
@@ -103,15 +121,13 @@ public class Server {
                 msg = in.readLine();
                 data = msg.split(" ");
                 if (data[0].equals("RequestCS")){
-                    SendAck();
-                }
-                if (data[0].equals("Acknowledge")){
-                    ack++;
-                }
-                // Enter critical section if we have an ack from all servers
-                if (requested && acks == numServer){
-                    requested = false;
-                    acks = 1;
+                    returnData = "Acknowledge ServerID: " + myID;
+                    out.println(returnData);
+                    out.close();
+                    sock.close();
+                    srv.close();
+                } else if (Arrays.asList(CLIENT_REQUESTS).contains(data[0])){
+                    RequestCS(servers);
                     if (data[0].equals("reserve")){
                         // Send appropriate response to client
                     } else if (data[0].equals("bookSeat")) {
@@ -120,15 +136,15 @@ public class Server {
                         // Send appropriate response to client
                     } else if (data[0].equals("delete")) {
                         // Send appropriate response to client
-                    } else {
-                        System.out.println("ERROR: No such command");
                     }
                     // Send the response and close the connection
                     out.println(returnData);
-                    ReleaseCS();
+                    ReleaseCS(servers);
                     out.close();
                     sock.close();
                     srv.close();
+                } else {
+                    System.out.println("ERROR: No such command");
                 }
             }
         } catch(Exception e) {

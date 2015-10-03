@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 public class TestQueue{
 	
 	public static void main(String[] args){
@@ -15,5 +17,7 @@ public class TestQueue{
 		q.dequeue(m);
 		q.dequeue(l);
 		q.printQueue();
+		String[] x = {"a","b","c","d"};
+		System.out.println(Arrays.asList(x).contains("a"));
 	}
 }

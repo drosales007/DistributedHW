@@ -88,7 +88,7 @@ public class Server {
         numSrvs = numServer;
 
         // Create an array to keep track of all server ips
-        String[][] servers = new String[numServer][2];
+        String[][] servers = new String[numServer+1][2];
         sc.nextLine();
 
         for (int i = 0; i < numServer; i++) {
@@ -96,13 +96,11 @@ public class Server {
             String[] servInfo = server.split(":");
             servers[i+1][0] = servInfo[0];
             servers[i+1][1] = servInfo[1];
-            /*System.out.println("Server IP: " + servers[i][0] + "\nServer " +
-                "Port: " + servers[i][1] + "\n\n");*/
         }
 
         // Synchronize the reservation list on startup
-        seating = new String[numSeat];
-        SyncSeating();
+        /*seating = new String[numSeat];
+        SyncSeating();*/
 
         // Handle requests from clients
         try{

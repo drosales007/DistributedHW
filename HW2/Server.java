@@ -14,6 +14,10 @@ public class Server {
         // Send an acknowledgement when a request comes in
     }
 
+    public static void ReceiveAck(){
+        // Handles an acknowlegment
+    }
+
     public static void ReleaseCS(){
         // Broadcast a message releaseing the critical section
     }
@@ -45,6 +49,16 @@ public class Server {
                                         String seatNum){
         // Handle bookSeat requests
         return "";
+    }
+
+    public class Queue{
+
+        Node head;
+        Nonde next;
+
+        public Queue(){
+            
+        }
     }
 
     public static void main (String[] args) {
@@ -90,6 +104,9 @@ public class Server {
                 data = msg.split(" ");
                 if (data[0].equals("RequestCS")){
                     SendAck();
+                }
+                if (data[0].equals("Acknowledge")){
+                    ack++;
                 }
                 // Enter critical section if we have an ack from all servers
                 if (requested && acks == numServer){

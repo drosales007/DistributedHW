@@ -13,7 +13,7 @@ public class BCThread extends Thread{
 		this.servers = servers;
 		this.servNum = servNum;
 		this.action = action;
-		this.port = Integer.parseInt("4320" + servNum);
+		this.port = Integer.parseInt("4330" + servNum);
 		this.myID = myID;
 	}
 

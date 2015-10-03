@@ -6,10 +6,13 @@ import java.util.Arrays;
 
 public class Server {
 
-    public static int ID;
+    public static int sold = 0;
+    public static boolean soldOut = false;
     public static int numSrvs;
     public static String[] seating;
     Queue q = new Queue();
+
+    public static int ID;
     public static String[] CLIENT_REQUESTS = {"reserve", "bookSeat", "search", "delete"};
 
     public static void SendAck(){
@@ -66,12 +69,43 @@ public class Server {
         return "";
     }
 
-    public synchronized String Reserve(String[] seats, String name){
+    public static String Reserve(String[] seats, String name){
         // Handle reserve requests
-        return "";
+        boolean prevRes = false;
+        String msg = "";
+        // Check if seating is sold out
+        if (!soldOut){
+            // If seating is not sold out we search through the seating
+            for (int i=0; i<seats.length; i++){
+                // Check if there is a previous reservation
+                if (seats[i].equals(name)){
+                    prevRes = true;
+                    msg = "Seat already booked against the name provided";
+                }
+            }
+            // If there was no previous reservation, find an empty seat to reserve
+            if (!prevRes){
+                for (int i=0; i<seats.length; i++){
+                    if (seats[i].equals("")){
+                        seats[i] = name;
+                        // Increment the number of seats sold
+                        sold++;
+                        // If seats sold is equal to seats available, sold out
+                        if (sold == seats.length){
+                            soldOut = true;
+                        }
+                        msg = "Seat assigned to you is " + i;
+                        break;
+                    }
+                }
+            }
+        } else {
+            msg = "Sold out - No seat available";
+        }
+        return msg;
     }
 
-    public synchronized String BookSeat(String[] seats, String name,
+    public String BookSeat(String[] seats, String name,
                                         String seatNum){
         // Handle bookSeat requests
         return "";
@@ -89,6 +123,11 @@ public class Server {
 
         // Create an array to keep track of all server ips
         String[][] servers = new String[numServer+1][2];
+        // Create an array to keep track of seating
+        seating = new String[numSeat];
+        for (int i=0; i<seating.length; i++){
+            seating[i] = "";
+        }
         sc.nextLine();
 
         for (int i = 0; i < numServer; i++) {
@@ -128,6 +167,7 @@ public class Server {
                     RequestCS(servers);
                     if (data[0].equals("reserve")){
                         // Send appropriate response to client
+                        returnData = Reserve(seating, data[1]);
                     } else if (data[0].equals("bookSeat")) {
                         // Send appropriate response to client
                     } else if (data[0].equals("search")) {
@@ -137,7 +177,7 @@ public class Server {
                     }
                     // Send the response and close the connection
                     out.println(returnData);
-                    ReleaseCS(servers);
+                    // ReleaseCS(servers);
                     out.close();
                     sock.close();
                     srv.close();

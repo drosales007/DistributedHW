@@ -7,6 +7,7 @@ public class BCThread extends Thread{
 	int port;
 	int servNum;
 	String action;
+	String[] seating;
 	String[][] servers;
 	
 	public BCThread(String[][] servers, int servNum, String action, int myID){
@@ -15,6 +16,15 @@ public class BCThread extends Thread{
 		this.action = action;
 		this.port = Integer.parseInt("4330" + servNum);
 		this.myID = myID;
+	}
+
+	public BCThread(String[][] servers, int servNum, String action, int myID, String[] seats){
+		this.servers = servers;
+		this.servNum = servNum;
+		this.action = action;
+		this.port = Integer.parseInt("4330" + servNum);
+		this.myID = myID;
+		this.seating = seats;
 	}
 
 	public void run(){
@@ -33,7 +43,11 @@ public class BCThread extends Thread{
 	            System.out.println(in.readLine());
 	            in.close();
 	        } else if (action.equals("release")){
-	        	msg = "ReleaseCS ServerID: " + myID;
+	        	String s = "" + seating[0];
+	        	for (int i=1; i<seating.length; i++){
+	        		s = s + "," + seating[i];
+	        	}
+	        	msg = "ReleaseCS ServerID: " + myID + " " + s;
 	        	out.println(msg);
 	        }
 	        out.close();

@@ -10,7 +10,7 @@ public class Server {
     public static boolean soldOut = false;
     public static int numSrvs;
     public static String[] seating;
-    Queue q = new Queue();
+    public static Queue q = new Queue();
 
     public static int ID;
     public static String[] CLIENT_REQUESTS = {"reserve", "bookSeat", "search", "delete"};
@@ -23,11 +23,11 @@ public class Server {
         // Handles an acknowlegment
     }
 
-    public static void ReleaseCS(String[][] servers){
+    public static void ReleaseCS(String[][] servers, String[] seats){
         // Broadcast a message releaseing the critical section
         for (int i=1; i<numSrvs; i++){
             if (i!=ID){
-                BCThread t = new BCThread(servers, i, "release", ID);
+                BCThread t = new BCThread(servers, i, "release", ID, seats);
                 t.start();
                 try {
                     t.join();
@@ -170,6 +170,16 @@ public class Server {
                     out.close();
                     sock.close();
                     srv.close();
+                } else if(data[0].equals("ReleaseCS")){
+                    while (!in.ready()){
+                        // wait
+                    }
+                    msg = in.readLine();
+                    System.out.println(msg);
+                    String[] s = msg.split(" ")[3].split(",");
+                    for (int i=0; i<s.length; i++){
+                        seating[i] = s[i];
+                    }
                 } else if (Arrays.asList(CLIENT_REQUESTS).contains(data[0])){
                     RequestCS(servers);
                     if (data[0].equals("reserve")){

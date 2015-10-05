@@ -25,9 +25,10 @@ public class Server {
 
     public static void ReleaseCS(String[][] servers, String[] seats){
         // Broadcast a message releaseing the critical section
-        for (int i=1; i<numSrvs; i++){
+        for (int i=1; i<numSrvs + 1; i++){
             if (i!=ID){
                 BCThread t = new BCThread(servers, i, "release", ID, seats);
+                System.out.println("Sending release to server: " + i);
                 t.start();
                 try {
                     t.join();
@@ -171,15 +172,16 @@ public class Server {
                     sock.close();
                     srv.close();
                 } else if(data[0].equals("ReleaseCS")){
-                    while (!in.ready()){
-                        // wait
-                    }
-                    msg = in.readLine();
-                    System.out.println(msg);
                     String[] s = msg.split(" ")[3].split(",");
+                    String g = "";
                     for (int i=0; i<s.length; i++){
                         seating[i] = s[i];
+                        g = g + seating[i] + ",";
                     }
+                    System.out.println(g);
+                    out.close();
+                    sock.close();
+                    srv.close();
                 } else if (Arrays.asList(CLIENT_REQUESTS).contains(data[0])){
                     RequestCS(servers);
                     if (data[0].equals("reserve")){
@@ -194,7 +196,7 @@ public class Server {
                     }
                     // Send the response and close the connection
                     out.println(returnData);
-                    // ReleaseCS(servers);
+                    ReleaseCS(servers, seating);
                     out.close();
                     sock.close();
                     srv.close();

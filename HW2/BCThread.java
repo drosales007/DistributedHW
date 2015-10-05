@@ -52,12 +52,7 @@ public class BCThread extends Thread{
 	        }
 	        out.close();
 	        sock.close();
-	    } catch (UnknownHostException e) {
-            System.err.println(e);
-        } catch (SocketException e) {
-            System.err.println(e);
-        } catch (IOException e) {
-            System.err.println(e);
+	    } catch (Exception e) {
         }
 	}
 }

@@ -56,8 +56,42 @@ public class Server {
         }
     }
 
-    public static void SyncSeating(){
+    public static String[] SyncSeating(String[][] servers){
         // Synchronize the reservation list with the other servers
+        for (int i=1; i<numSrvs+1; i++){
+            if (i!=ID){
+                try {
+                    String msg;
+                    Socket sock = new Socket(servers[i][0], Integer.parseInt(servers[i][1]));
+                    PrintWriter out = new PrintWriter(sock.getOutputStream(), true);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+                    while(!in.ready()){
+                        // wait
+                    }
+                    msg = in.readLine();
+                    System.out.println(msg);
+                    msg = "sync ServerID: " + ID;
+                    out.println(msg);
+                    while(!in.ready()){
+                        // wait
+                    }
+                    msg = in.readLine();
+                    String[] seating = msg.split(",");
+                    /*for (int j=0; j<seating.length; j++){
+                        if (seating[j] == null){
+                            seating[j] = "";
+                        }
+                        System.out.println(seating[j]);
+                    }*/
+                    System.out.println("Reservations have been synchronized.");
+                    return seating;
+                } catch(Exception e) {
+                    System.out.print("Could not synchronize reservations with ServerID: " + i + "\n");
+                }
+            }
+        }
+        String[] x = new String[servers.length];
+        return x;
     }
 
     public String Search(String[] seats, String name){
@@ -146,7 +180,14 @@ public class Server {
         }
 
         // Synchronize the reservation list on startup
-        // SyncSeating();
+        String[] sync = SyncSeating(servers);
+        for (int i=0; i<sync.length; i++){
+            if (sync[i] == null){
+                seating[i] = "";
+            } else {
+                seating[i] = sync[i];
+            }
+        }
 
         // Handle requests from clients
         try{
@@ -173,12 +214,9 @@ public class Server {
                     srv.close();
                 } else if(data[0].equals("ReleaseCS")){
                     String[] s = msg.split(" ")[3].split(",");
-                    String g = "";
                     for (int i=0; i<s.length; i++){
                         seating[i] = s[i];
-                        g = g + seating[i] + ",";
                     }
-                    System.out.println(g);
                     out.close();
                     sock.close();
                     srv.close();
@@ -197,6 +235,15 @@ public class Server {
                     // Send the response and close the connection
                     out.println(returnData);
                     ReleaseCS(servers, seating);
+                    out.close();
+                    sock.close();
+                    srv.close();
+                } else if(data[0].equals("sync")){
+                    returnData = seating[0];
+                    for (int i=1; i<seating.length; i++){
+                        returnData = returnData + "," + seating[i];
+                    }
+                    out.println(returnData);
                     out.close();
                     sock.close();
                     srv.close();

@@ -59,14 +59,9 @@ public class Client {
                     in.close();
                     out.close();
                     sock.close();
-                } catch (UnknownHostException e) {
-                  System.err.println(e);
-                } catch (SocketException e) {
-                    System.err.println(e);
-                } catch (IOException e) {
-                    System.err.println(e);
+                    return true;
+                } catch (Exception e) {
                 }
-                return true;
             }
         }
     }
@@ -100,7 +95,7 @@ public class Client {
                     TCPCall(cmd, servers, numServer);
                 } else {
                     System.out.println("Invalid command. The command should " +
-                        "be of the for 'action name'.\nEx: reserve david");
+                        "be of the form '<action> <name>'.\nEx: reserve david");
                 }
             } else if (tokens[0].equals("bookSeat")) {
                 // TODO: send appropriate command to the server and display the

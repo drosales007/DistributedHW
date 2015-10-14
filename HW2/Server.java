@@ -263,10 +263,13 @@ public class Server {
                         returnData = Reserve(seating, data[1]);
                     } else if (data[0].equals("bookSeat")) {
                         // Send appropriate response to client
+                    	returnData = bookSeat(seating, data[1], data[2]);
                     } else if (data[0].equals("search")) {
                         // Send appropriate response to client
+                    	returnData = Search(seating, data[1]);
                     } else if (data[0].equals("delete")) {
                         // Send appropriate response to client
+                    	returnData = Delete(seating, data[1]);
                     }
                     // Send the response and close the connection
                     out.println(returnData);

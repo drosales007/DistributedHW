@@ -95,13 +95,36 @@ public class Server {
     }
 
     public String Search(String[] seats, String name){
-        // Handle search requests
-        return "";
+    	  // Handle search requests
+            for (int i=0; i<seats.length; i++){
+                // Check if there is a previous reservation
+                if (seats[i].equals(name)){
+                    msg = "Seat number is" + seat[i];
+                    return msg;
+                }    
+            }
+            
+            msg = "Reservation no found ";
+                       
+           return msg;
+     
     }
 
     public String Delete(String[] seats, String name){
-        // Handle delete requests
-        return "";
+    	  // Handle search requests
+        for (int i=0; i<seats.length; i++){
+            // Check if there is a previous reservation
+            if (seats[i].equals(name)){
+            	msg = "Seat number" + seat[i] + "is deleted";
+            	seats[i] = ""
+                
+                return msg;
+            }    
+        }
+        
+        msg = "name no found ";
+                   
+       return msg;
     }
 
     public static String Reserve(String[] seats, String name){
@@ -142,10 +165,23 @@ public class Server {
 
     public String BookSeat(String[] seats, String name,
                                         String seatNum){
-        // Handle bookSeat requests
-        return "";
-    }
-
+    	 msg = "No seat available";
+            // Search for book seat
+            for (int i=0; i<seats.length; i++){
+                // Check if there is a previous reservation
+            	if (seats[i].equals(name)){	
+            		return msg; 		
+            	}
+            }
+            if (seats[seatNum] != Null){        
+                return msg;        
+            }
+            
+            seats[seatNum] = name;
+            msg = "Seat number" + seatNum + "has been reserved";
+                      
+           return msg;
+        }
     public static void main (String[] args) {
 
         Scanner sc = new Scanner(System.in);

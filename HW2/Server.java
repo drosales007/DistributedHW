@@ -96,6 +96,7 @@ public class Server {
 
     public String Search(String[] seats, String name){
     	  // Handle search requests
+    	 String msg = "";
             for (int i=0; i<seats.length; i++){
                 // Check if there is a previous reservation
                 if (seats[i].equals(name)){
@@ -111,21 +112,29 @@ public class Server {
     }
 
     public String Delete(String[] seats, String name){
-    	  // Handle search requests
+    	  // Handle delete requests
+    	 String msg = "";
         for (int i=0; i<seats.length; i++){
             // Check if there is a previous reservation
-            if (seats[i].equals(name)){
-            	msg = "Seat number" + seat[i] + "is deleted";
-            	seats[i] = ""
+        	if (seats[i].equals(name)){
+                seats[i] = "";
+                // Decrement the number of seats sold
+                sold--;
+                // If seats delete is no equal to seats available, 
+                if (sold == !seats.length){
+                    soldOut = false;
+                }
+                msg = "Seat number" + seat[i] + "is deleted";
+                break;
                 
-                return msg;
-            }    
-        }
-        
-        msg = "name no found ";
-                   
+            } else {
+    
+        msg = "No reservation found for" + (name) ;
+            } 
        return msg;
+        }
     }
+
 
     public static String Reserve(String[] seats, String name){
         // Handle reserve requests
@@ -165,23 +174,40 @@ public class Server {
 
     public String BookSeat(String[] seats, String name,
                                         String seatNum){
-    	 msg = "No seat available";
-            // Search for book seat
-            for (int i=0; i<seats.length; i++){
+    	// Handle bookseat requests
+        String msg = "";
+        // Check if seating is sold out
+        if (!soldOut){
+            // If seating is not sold out we search through the seating
+        	for (int i=0; i<seats.length; i++){
                 // Check if there is a previous reservation
             	if (seats[i].equals(name)){	
+            		prevRes = true;
+                    msg = "Seat already booked against the name provided";
             		return msg; 		
             	}
             }
-            if (seats[seatNum] != Null){        
-                return msg;        
-            }
+        	if (!prevRes){
+                for (int i=0; i<seats.length; i++){
+                    if (seats[seatNum].equals("")){
+                        seats[seatNum] = name;
+                        // Increment the number of seats sold
+                        sold++;
+                        // If seats sold is equal to seats available, sold out
+                        if (sold == seats.length){
+                            soldOut = true;
+                        }
+                        msg = "Seat number" + seatNum + "has been reserved";
+                        break;
+                    }
             
-            seats[seatNum] = name;
-            msg = "Seat number" + seatNum + "has been reserved";
-                      
-           return msg;
+        } else {
+            msg = "Sold out - No seat available";
         }
+        return msg;
+    }
+    
+     
     public static void main (String[] args) {
 
         Scanner sc = new Scanner(System.in);

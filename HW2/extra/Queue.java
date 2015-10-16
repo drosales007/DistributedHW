@@ -11,10 +11,16 @@ public class Queue{
 			head = n1;
 		} else {
 			QNode n2 = head;
-			while (n2.next != null){
-				n2 = n2.next;
+			QNode n3;
+			while(true){
+				try {
+					n3 = n2.next;
+					n2 = n3;
+				} catch (Exception e){
+					n2.next = n1;
+					break;
+				}
 			}
-			n2.next = n1;
 		}
 	}
 
@@ -25,20 +31,27 @@ public class Queue{
 		QNode n2;
 		QNode prev = null;
 		n1 = head;
-		n2 = n1.next;
-		if (n2==null){
-			head = null;
+		try {
+			n2 = head.next;
+		} catch (Exception e){
+			n2 = null;
 		}
 		while (n2!=null){
 			if (n1.value[0]!=value[0]){
 				prev = n1;
 				n1 = n2;
-				n2 = n2.next;
+				try {
+					n2 = n2.next;
+				} catch (Exception e){
+					n2 = null;
+				}
 			} else if (n1.value[1]==value[1]){
 				prev.next = n2;
 				return true;
 			}
 		}
+		head = null;
+	
 		return true;
 	}
 
@@ -49,9 +62,16 @@ public class Queue{
 		if (head != null){
 			n = head;
 			que = que + head.getValue();
-			while (n.next != null){
-				n = n.next;
-				que = que + ", " + " " + n.getValue();
+			QNode n2 = head;
+			QNode n3;
+			while (true){
+				try {
+					n3 = n2.next;
+					n2 = n3;
+					que = que + ", " + " " + n2.getValue();
+				} catch (Exception e){
+					break;
+				}
 			}
 		} else {
 			que = "Empty";
@@ -63,29 +83,39 @@ public class Queue{
 		// Checks the queue and returns the process ID who is next
 		QNode n1 = head;
 		QNode next_node = n1;
-		QNode n2;
-		while (n1.next!=null){
-			n2 = n1.next;
-			if (n1.value[0]==n2.value[0]){
-				if (n1.value[1]<n2.value[1]){
-					next_node = n1;
-				} else {
+		QNode n2 = null;
+		QNode n3;
+		try {
+			if (head.next!=null){
+				n2 = head.next;
+			}
+		} catch (Exception e){
+		}
+		if (n2==null){
+			return next_node.value[1];
+		}
+		while (true){
+			if (next_node.value[0]==n2.value[0]){
+				if (next_node.value[1]>n2.value[1]){
 					next_node = n2;
 				}
-			} else if(n1.value[0]<n2.value[0]){
-				next_node = n1;
-			} else {
+			} else if(next_node.value[0]>n2.value[0]){
 				next_node = n2;
 			}
+			try {
+				n3 = n2.next;
+				n2 = n3;
+			} catch (Exception e){
+				return next_node.value[1];
+			}
 		}
-		return next_node.value[1];
 	}
 
 	public class QNode{
 	// A node in a queue
 	
 		int[] value;
-		QNode next;
+		QNode next = null;
 
 		public String getValue(){
 			String v = "" + value[0] + ":" + value[1];

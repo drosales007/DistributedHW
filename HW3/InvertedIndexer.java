@@ -30,18 +30,18 @@ import org.apache.hadoop.mapred.Reporter;
 
 public class InvertedIndexer {
 
-	
+
   // The mapper class, you should modify T1, T2, T3, T4 to your desired
   // types
-  
+
   public static class InvertedIndexMapper extends MapReduceBase
       implements Mapper<Object, Text, Text, Text> {
 
 
 	  private final static Text word = new Text();
 	  private final static Text location = new Text();
-	
-	
+
+
 	@Override
     public void map(Object key, Text val,
         OutputCollector<Text, Text> output, Reporter reporter)
@@ -57,7 +57,7 @@ public class InvertedIndexer {
 	        word.set(itr.nextToken());
 	        output.collect(word, location);
 	      }
-     
+
     }
   }
 
@@ -66,11 +66,12 @@ public class InvertedIndexer {
   // types
   public static class InvertedIndexReducer extends MapReduceBase
       implements Reducer<Text, Text, Text, Text> {
-	  
+
 
     public void reduce(Text key, Iterator<Text> values,
         OutputCollector<Text, Text> output, Reporter reporter)
       throws IOException {
+		HashMap<String, Integer> counter = new HashMap<String, Integer>();
     	boolean first = true;
         StringBuilder toReturn = new StringBuilder();
         while (values.hasNext()){
@@ -78,13 +79,28 @@ public class InvertedIndexer {
             toReturn.append(", ");
           first=false;
           toReturn.append(values.next().toString());
+
+			for (String a : toReturn) {
+				if (counter.containsKey(a)) {
+					int oldValue = counter.get(a);
+					counter.put(a, oldValue + 1);
+				} else {
+					counter.put(a, 1);
+				}
         }
 
-        output.collect(key, new Text(toReturn.toString()));
+		output.collect(key, new Text(toReturn.toString() + "\t" + counter.toString().values()));
     }
   }
 
+	String s = "one two three two three three";
+	String[] sArr = s.split(" ");
 
+	//naive approach
+	HashMap<String, Integer> counter = new HashMap<String, Integer>();
+
+
+	}
   /**
    * The actual main() method for our program; this is the
    * "driver" for the MapReduce job.
@@ -113,3 +129,5 @@ public class InvertedIndexer {
 	    }
   }
 }
+
+
